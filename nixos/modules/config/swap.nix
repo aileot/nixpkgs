@@ -95,7 +95,7 @@ let
     };
 
   swapCfg =
-    { config, options, ... }:
+    { config, ... }:
     {
 
       options = {
@@ -107,8 +107,9 @@ let
         };
 
         label = mkOption {
+          default = null;
           example = "swap";
-          type = types.str;
+          type = types.nullOr types.str;
           description = ''
             Label of the device.  Can be used instead of {var}`device`.
           '';
@@ -200,7 +201,7 @@ let
       };
 
       config = {
-        device = mkIf options.label.isDefined "/dev/disk/by-label/${config.label}";
+        device = mkIf (config.label != null) "/dev/disk/by-label/${config.label}";
         deviceName = lib.replaceStrings [ "\\" ] [ "" ] (utils.escapeSystemdPath config.device);
         realDevice =
           if config.randomEncryption.enable then "/dev/mapper/${config.deviceName}" else config.device;
